@@ -241,7 +241,7 @@ impl<'tree, Tab> DockArea<'tree, Tab> {
     /// Shows the docking area.
     #[inline]
     pub fn show(self, ctx: &Context, tab_viewer: &mut impl TabViewer<Tab = Tab>) {
-        let layer_id = LayerId::background();
+        let layer_id = LayerId::new(Order::Middle, Id::new("asdf"));
         let max_rect = ctx.available_rect();
         let clip_rect = ctx.available_rect();
 
@@ -261,13 +261,16 @@ impl<'tree, Tab> DockArea<'tree, Tab> {
         if let Some(margin) = style.dock_area_padding {
             rect.min += margin.left_top();
             rect.max -= margin.right_bottom();
+            /*
             ui.painter().rect(
                 rect,
                 margin.top,
                 style.separator_color_idle,
                 Stroke::new(margin.top, style.border_color),
             );
+ */
         }
+
 
         if self.tree.is_empty() {
             ui.allocate_rect(rect, Sense::hover());
@@ -310,7 +313,7 @@ impl<'tree, Tab> DockArea<'tree, Tab> {
                     style.separator_color_idle
                 };
 
-                ui.painter().rect_filled(separator, Rounding::none(), color);
+                //ui.painter().rect_filled(separator, Rounding::none(), color);
 
                 self.tree[node_index.left()].set_rect(left);
                 self.tree[node_index.right()].set_rect(right);
@@ -328,7 +331,7 @@ impl<'tree, Tab> DockArea<'tree, Tab> {
             } = &mut self.tree[node_index]
             {
                 let rect = *rect;
-                ui.set_clip_rect(rect);
+                //ui.set_clip_rect(rect);
 
                 let height_topbar = style.tab_bar_height;
 
@@ -341,16 +344,20 @@ impl<'tree, Tab> DockArea<'tree, Tab> {
 
                 // tabs
                 ui.scope(|ui| {
+                    /*
                     ui.painter().rect_filled(
                         tabbar,
                         style.tab_rounding,
                         style.tab_bar_background_color,
                     );
+ */
 
                     let a = pos2(tabbar.min.x, tabbar.max.y - px);
                     let b = pos2(tabbar.max.x, tabbar.max.y - px);
+                    /*
                     ui.painter()
                         .line_segment([a, b], (px, style.tab_outline_color));
+ */
                     let mut available_width = tabbar.max.x - tabbar.min.x;
                     if style.show_add_buttons {
                         available_width -= Style::TAB_PLUS_SIZE;
@@ -375,20 +382,15 @@ impl<'tree, Tab> DockArea<'tree, Tab> {
                             let label = tab_viewer.title(tab);
 
                             let response = if is_being_dragged {
-                                let layer_id = LayerId::new(Order::Tooltip, id);
-                                let response = ui
-                                    .with_layer_id(layer_id, |ui| {
-                                        style.tab_title(
-                                            ui,
-                                            label,
-                                            is_active,
-                                            is_active && Some(node_index) == focused,
-                                            is_being_dragged,
-                                            id,
-                                            expanded_width,
-                                        )
-                                    })
-                                    .response;
+                                let (response, _, _) = style.tab_title(
+                                    ui,
+                                    label,
+                                    is_active,
+                                    is_active && Some(node_index) == focused,
+                                    is_being_dragged,
+                                    id,
+                                    expanded_width,
+                                );
 
                                 let sense = Sense::click_and_drag();
                                 let response = ui.interact(response.rect, id, sense);
@@ -399,7 +401,7 @@ impl<'tree, Tab> DockArea<'tree, Tab> {
 
                                     let delta = pointer_pos - start;
                                     if delta.x.abs() > 30.0 || delta.y.abs() > 6.0 {
-                                        ui.ctx().translate_layer(layer_id, delta);
+                                        //ui.ctx().translate_layer(layer_id, delta);
 
                                         drag_data = Some((node_index, tab_index));
                                     }
@@ -521,8 +523,10 @@ impl<'tree, Tab> DockArea<'tree, Tab> {
                     }
 
                     if tab_viewer.clear_background(tab) {
+                        /*
                         ui.painter()
                             .rect_filled(rect, 0.0, style.tab_background_color);
+ */
                     }
 
                     let mut ui = ui.child_ui(rect, Default::default());
@@ -609,7 +613,7 @@ impl<'tree, Tab> DockArea<'tree, Tab> {
                 let painter = ui.ctx().layer_painter(layer_id);
 
                 if src != dst || self.tree[dst].tabs_count() > 1 {
-                    painter.rect_filled(helper, 0.0, style.selection_color);
+                    //painter.rect_filled(helper, 0.0, style.selection_color);
                 }
 
                 if ui.input().pointer.any_released() {
