@@ -45,10 +45,9 @@ impl Default for MyApp {
 }
 
 fn pointer_over_area(ui: &mut egui::Ui) {
-    ui.label(format!(
-        "Pointer is over egui {:?}",
-        ui.ctx().is_pointer_over_area()
-    ));
+    let pos = ui.ctx().pointer_interact_pos();
+    let layer = pos.map(|pos| ui.ctx().layer_id_at(pos));
+    ui.label(format!("Pointer is over egui layer {:?}", layer,));
 }
 
 impl eframe::App for MyApp {
@@ -57,5 +56,8 @@ impl eframe::App for MyApp {
 
         egui::Window::new("My Window").show(ctx, pointer_over_area);
         egui::Area::new("My Area").show(ctx, pointer_over_area);
+        egui::Window::new("My Dock Window").show(ctx, |ui| {
+            DockArea::new(&mut self.tree).show_inside(ui, &mut TabViewer {});
+        });
     }
 }

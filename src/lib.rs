@@ -257,6 +257,7 @@ impl<'tree, Tab> DockArea<'tree, Tab> {
 
         let mut state = State::load(ui.ctx(), self.id);
         let mut rect = ui.max_rect();
+        ui.expand_to_include_rect(ui.max_rect()); // Expand frame to include it all
 
         if let Some(margin) = style.dock_area_padding {
             rect.min += margin.left_top();
